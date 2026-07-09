@@ -7,3 +7,5 @@ public class Main {
 
     }
 }
+
+// git rm -cashed
