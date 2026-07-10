@@ -1,15 +1,24 @@
 package pl.coderslab;
 
 import java.sql.SQLException;
+import java.util.Scanner;
 
 import static pl.coderslab.entity.UserDao.*;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
+
     public static void main(String[] args) throws SQLException {
-//        removeUser();
-        update();
-//        newUserInput();
+        System.out.println("Hello! What are we going to do today?");
+        System.out.println("1. Add new user");
+        System.out.println("2. Update info about existing user");
+
+        Scanner scanner = new Scanner(System.in);
+        String choice = scanner.nextLine();
+
+        switch (choice) {
+            case "1" -> newUserInput();
+            case "2" -> update();
+            default -> System.out.println("Please select a correct option");
+        }
     }
 }

@@ -10,7 +10,7 @@ import static java.lang.System.exit;
 import static java.lang.System.setOut;
 import static pl.coderslab.DbUtil.*;
 
-
+// najpiewr  uzytkownik wybiera czyy jest new user czy chce sie zalogowac a potem dopiero te funkcje
 
 public class UserDao {
 
@@ -85,74 +85,70 @@ public class UserDao {
     }
 
     public static void update() throws SQLException {
-        while (true) try {
-            System.out.println("Please provide your email address ");
-            String loginInput = scanner.nextLine();
-            User user = getUserByEmail(connect(), loginInput);
+        System.out.println("Please provide your email address ");
+        String loginInput = scanner.nextLine();
+        User user = getUserByEmail(connect(), loginInput);
 
-            if (user != null) {
-                System.out.println("Please provide your password: ");
-                String passwordInput = scanner.nextLine();
+        while (user == null) {
+            System.out.println("Incorrect email, please try again");
+            loginInput = scanner.nextLine();
+            user = getUserByEmail(connect(), loginInput);
+        }
 
-                if (BCrypt.checkpw(passwordInput, user.getPassword()) == true) {
-                    while (true) {
-                        if (user != null && BCrypt.checkpw(passwordInput, user.getPassword())) {
-                            int userInputInt = Integer.parseInt(getGetUserByEmail());
-                            System.out.println("Please provide which section you wish to update: usermame, email, password ");
-                            while (true) {
-                                String userOption = scanner.nextLine();
-                                switch (userOption) {
-                                    case "username" -> {
-                                        try {
-//                                User user = getUserById(connect(), userInputInt);
-                                            System.out.println("Please input new username: ");
-                                            String changedUsername = scanner.nextLine();
-                                            user.setUserName(changedUsername);
-                                            DbUtil.update(connect(), user);
-                                        } catch (SQLException e) {
-                                            System.out.println("Error: " + e.getMessage());
-                                        }
-                                        return;
-                                    }
-                                    case "email" -> {
-                                        try {
-//                                User user = getUserById(connect(), userInputInt);
-                                            System.out.println("Please input new email address: ");
-                                            String changedEmail = scanner.nextLine();
-                                            user.setEmail(changedEmail);
-                                            DbUtil.update(connect(), user);
-                                        } catch (SQLIntegrityConstraintViolationException e) {
-                                            System.out.println("This address eamil already exists, please provide another");
-                                        } catch (SQLException e) {
-                                            System.out.println("Error: " + e.getMessage());
-                                        }
-                                        return;
-                                    }
-                                    case "password" -> { // tutaj jeszcze trzeba sprawdzic hashe chyba? i zahashowac
-                                        try {
-//                                User user = getUserById(connect(), userInputInt);
-                                            System.out.println("Please input new password: ");
-                                            String changedPassword = scanner.nextLine();
-                                            user.setPassword(changedPassword);
-                                            DbUtil.update(connect(), user);
-                                        } catch (SQLException e) {
-                                            System.out.println("Error: " + e.getMessage());
-                                        }
-                                        return;
-                                    }
-                                    default -> System.out.println("Please select a correct option.");
-                                }
-                            }
-                        } else {
-                            System.out.println("Incorrect password, please try again");
-                        }
-                    } else {
-                        System.out.println("Inncorect email, pleasy try again");
+        System.out.println("Please provide your password");
+        String passwordInput = scanner.nextLine();
+
+        while (!BCrypt.checkpw(passwordInput, user.getPassword())) {
+            System.out.println("Incorrect password, please try again!");
+            passwordInput = scanner.nextLine();
+        }
+        System.out.println("Please provide which section you wish to update: usermame, email, password ");
+
+        while (true) {
+            String userOption = scanner.nextLine();
+            switch (userOption) {
+                case "username" -> {
+                    try {
+//                      User user = getUserById(connect(), userInputInt);
+                        System.out.println("Please input new username: ");
+                        String changedUsername = scanner.nextLine();
+                        user.setUserName(changedUsername);
+                        DbUtil.update(connect(), user);
+                    } catch (SQLException e) {
+                        System.out.println("Error: " + e.getMessage());
                     }
-                    break;
+                    return;
                 }
+                case "email" -> {
+                    try {
+//                      User user = getUserById(connect(), userInputInt);
+                        System.out.println("Please input new email address: ");
+                        String changedEmail = scanner.nextLine();
+                        user.setEmail(changedEmail);
+                        DbUtil.update(connect(), user);
+                    } catch (SQLIntegrityConstraintViolationException e) {
+                        System.out.println("This address eamil already exists, please provide another");
+                    } catch (SQLException e) {
+                        System.out.println("Error: " + e.getMessage());
+                    }
+                    return;
+                }
+                case "password" -> {
+                    try {
+//                ser user = getUserById(connect(), userInputInt);
+                        System.out.println("Please input new password: ");
+                        String changedPassword = scanner.nextLine();
+                        user.setPassword(changedPassword);
+                        DbUtil.update(connect(), user);
+                    } catch (SQLException e) {
+                        System.out.println("Error: " + e.getMessage());
+                    }
+                }
+                case "exit" -> {
+                    return;
+                }
+                default -> System.out.println("Please select a correct option.");
             }
         }
+    }
 }
-}
-
