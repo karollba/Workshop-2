@@ -38,15 +38,16 @@ public class User {
     public String getPassword() {
         return password;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
 
 
-    public User(int id, String userName, String email) {
-        this.id  = getId();
-        this.userName = getUserName();
-        this.email = getEmail();
+    public User(String userName, String email, String password) {
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
 
     }
 }
