@@ -1,78 +1,145 @@
 package pl.coderslab.entity;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import pl.coderslab.DbUtil;
+
+import java.sql.*;
+import java.util.Scanner;
+
+import static java.lang.System.exit;
+import static java.lang.System.setOut;
+import static pl.coderslab.DbUtil.*;
 
 // metody maja byc obiektowe (mogloby byx statyczne w ostatecznosci
 
 public class UserDao {
-    private static final String ADD_USER = "INSERT INTO users (email, username, password) VALUES (?, ?, ?);";
-    private static final String UPDATE_USER = ""
-    private static final String GET_USER_BY_ID = "INSERT INTO users (email, username, password) VALUES (?, ?, ?);";
-    private static final String REMOVE_USER_BY_ID = "DELETE FROM users WHERE id = ?;";
-    private static final String GET_ALL_USERS = "SELECT * FROM users WHERE id = ?";
 
+    static Scanner scanner = new Scanner(System.in);
 
-    public static void insert(Connection conn, String query, String... params) {
-        try ( PreparedStatement statement = conn.prepareStatement(ADD_USER)) {
-            for (int i = 0; i < params.length; i++) {
-                statement.setString(i + 1, params[i]);
-            }
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+    public static User[] getAllUsers(Connection conn, String query) throws SQLException {
+        int rows = countAll(conn);
+        User[] users = new User[rows];
 
-    public static void update(Connection conn, String queryUpdate, String... columnNames) {
-        try ( PreparedStatement statement = conn.prepareStatement(UPDATE_USER)) {
-            for (int i = 0; i < columnNames.length; i++) {
-                statement.setString(i + 1, columnNames[i]);
-            }
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void remove(Connection conn, int id) {
-        try {
-            PreparedStatement statement = conn.prepareStatement(REMOVE_USER_BY_ID);
-            statement.setInt(1, id);
-            statement.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
-    public static User[] getAllUsers(Connection conn, String tableName) throws SQLException {
-        int rows = countAll(conn, "users");
-        User[] cinemas = new User[rows];
-
-        PreparedStatement statement = conn.prepareStatement(GET_ALL_USERS);
+        PreparedStatement statement = conn.prepareStatement(query);
         ResultSet resultSet = statement.executeQuery();
 
         int i = 0;
         while (resultSet.next()) {
-            cinemas[i] = new User(resultSet.getInt("id"), resultSet.getString("email"), resultSet.getString("username"));
+            users[i] = new User(resultSet.getInt("id"), resultSet.getString("userName"), resultSet.getString("email"));
             i++;
         }
-        return cinemas;
+        return users;
+    }
+
+    public static User getUserById(Connection conn, String query, int id) throws SQLException {
+
+        PreparedStatement statement = conn.prepareStatement(query);
+        statement.setInt(1, id);
+        ResultSet resultSet = statement.executeQuery();
+        resultSet.next();
+
+        User user = new User(resultSet.getInt("id"), resultSet.getString("email"), resultSet.getString("username"));
+        return user;
+    }
+
+    // removeuser
+
+    public static void removeUser() throws SQLException {
+        System.out.println("Please provide user id you wish to remove:");
+        String userInput = scanner.nextLine();
+        int userInputInt = Integer.parseInt(userInput);
+
+        remove(connect(), userInputInt, getRemoveUserById());
+
+    }
+    // adduser
+//    public static void addUser() throws SQLException {
+//        System.out.println("Please provide username:");
+//        String userInputUserName = scanner.nextLine();
+//
+//        // ttuaj sprawdz czy sie nie powtarza
+//        System.out.println("Please provide email address:");
+//        String userInputEmailAddress = scanner.nextLine();
+//
+//        // zrob tak zeby nie bylo widac tak fajnie jak masz w terminalu normalnie
+//        System.out.println("Please provide password:");
+//        String userInputPassword = scanner.nextLine();
+//
+//       DbUtil.create(user);
+//
+//    }
+    //uptade user
+
+    public static void updateUser() {
+        System.out.println("Please provide User id you wish to update: ");
+        String userInput = scanner.nextLine();
+        int userInputInt = Integer.parseInt(userInput);
+        System.out.println("Please provide which section you wish to update: usermame, email, password ");
+
+        while (true) {
+            String userOption = scanner.nextLine();
+            switch (userOption) {
+                case "username" -> {
+                    try {
+                        System.out.println("Please input new username: ");
+                        String changedUsername = scanner.nextLine();
+                        update(connect(), getUpdateUsername(), userInputInt, changedUsername, "username");
+                    } catch (SQLException e) {
+                        System.out.println("Error: " + e.getMessage());
+                    }
+                }
+                case "email" -> {
+                    try {
+                        System.out.println("Please input new email address: ");
+                        String newEmailAddress = scanner.nextLine();
+                        update(connect(), getUpdateEmail(), userInputInt, newEmailAddress, "email");
+                    } catch (SQLIntegrityConstraintViolationException e) {
+                        System.out.println("This address eamil already exists, please provide another");
+                    } catch (SQLException e) {
+                        System.out.println("Error: " + e.getMessage());
+                    }
+                }
+//                case "password" -> {
+//                    try {
+//
+//                    } catch (SQLException e) {
+//                        System.out.println("Error: " + e.getMessage());
+//                    }
+//                }
+                // tu musisz chyba walidowac id? albo oddzielna funkcja wgl dla password
+                case "exit" -> {
+                    System.exit(0);
+                }
+
+                default -> System.out.println("Please select a correct option.");
+
+            }
+        }
     }
 
 
-public static int countAll(Connection conn) throws SQLException {
-    String query = "SELECT COUNT(*) FROM users;";
-    PreparedStatement statement = conn.prepareStatement(query);
-    ResultSet resultSet = statement.executeQuery();
 
-    resultSet.next();
-    int count = resultSet.getInt(1);
 
-    return count;
-}
+    public static void updateUsername() {
+    }
+
+//    // nie najlepsze rozwiazanie zmien!
+//    public static void selectOption(){
+//        while (true) {
+//            options();
+//            String userOption = scanner.nextLine();
+//
+//            switch (userOption) {
+//                case "username" -> updateUser();
+//                case "email" -> updateUser();
+//                case "password" -> updateUser();
+//                case "exit" -> {
+//                    System.exit(0);
+//                }
+//
+//                default -> System.out.println("Please select a correct option.");
+//
+//            }
+//        }
+//    }
+
 }

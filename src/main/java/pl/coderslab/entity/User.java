@@ -43,4 +43,10 @@ public class User {
     }
 
 
+    public User(int id, String userName, String email) {
+        this.id  = getId();
+        this.userName = getUserName();
+        this.email = getEmail();
+
+    }
 }
