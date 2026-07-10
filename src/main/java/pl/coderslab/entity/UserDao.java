@@ -9,7 +9,6 @@ import static java.lang.System.exit;
 import static java.lang.System.setOut;
 import static pl.coderslab.DbUtil.*;
 
-// metody maja byc obiektowe (mogloby byx statyczne w ostatecznosci
 
 public class UserDao {
 
@@ -41,7 +40,6 @@ public class UserDao {
         return user;
     }
 
-    // removeuser
 
     public static void removeUser() throws SQLException {
         System.out.println("Please provide user id you wish to remove:");
@@ -50,24 +48,23 @@ public class UserDao {
 
         remove(connect(), userInputInt, getRemoveUserById());
 
+
     }
-    // adduser
-//    public static void addUser() throws SQLException {
-//        System.out.println("Please provide username:");
-//        String userInputUserName = scanner.nextLine();
-//
-//        // ttuaj sprawdz czy sie nie powtarza
-//        System.out.println("Please provide email address:");
-//        String userInputEmailAddress = scanner.nextLine();
-//
-//        // zrob tak zeby nie bylo widac tak fajnie jak masz w terminalu normalnie
-//        System.out.println("Please provide password:");
-//        String userInputPassword = scanner.nextLine();
-//
-//       DbUtil.create(user);
-//
-//    }
-    //uptade user
+//     adduser
+    public static void addUser() throws SQLException {
+        System.out.println("Please provide username:");
+        String userInputUserName = scanner.nextLine();
+
+        System.out.println("Please provide email address:");
+        String userInputEmailAddress = scanner.nextLine();
+
+        // zrob tak zeby nie bylo widac tak fajnie jak masz w terminalu normalnie
+        System.out.println("Please provide password:");
+        String userInputPassword = scanner.nextLine();
+
+       DbUtil.create(user);
+
+    }
 
     public static void updateUser() {
         System.out.println("Please provide User id you wish to update: ");
@@ -86,6 +83,7 @@ public class UserDao {
                     } catch (SQLException e) {
                         System.out.println("Error: " + e.getMessage());
                     }
+                    return;
                 }
                 case "email" -> {
                     try {
@@ -97,6 +95,7 @@ public class UserDao {
                     } catch (SQLException e) {
                         System.out.println("Error: " + e.getMessage());
                     }
+                    return;
                 }
 //                case "password" -> {
 //                    try {
@@ -104,11 +103,8 @@ public class UserDao {
 //                    } catch (SQLException e) {
 //                        System.out.println("Error: " + e.getMessage());
 //                    }
+//                return;
 //                }
-                // tu musisz chyba walidowac id? albo oddzielna funkcja wgl dla password
-                case "exit" -> {
-                    System.exit(0);
-                }
 
                 default -> System.out.println("Please select a correct option.");
 

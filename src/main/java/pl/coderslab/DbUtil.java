@@ -1,6 +1,8 @@
 package pl.coderslab;
 
+import com.mysql.cj.exceptions.ConnectionIsClosedException;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.mindrot.jbcrypt.BCrypt;
 import pl.coderslab.entity.User;
 
 import java.sql.*;
@@ -53,17 +55,14 @@ public class DbUtil {
         }
     }
 
-    public static void update(Connection conn, String queryUpdate, int id, String userinput, String... columnNames) {
-        try ( PreparedStatement statement = conn.prepareStatement(queryUpdate)) {
-            for (int i = 0; i < columnNames.length; i++) {
-                statement.setString(i + 1, columnNames[i]);
-            }
-            statement.setString(1, userinput);
-            statement.setInt(2, id);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public static void update(Connection conn, String queryUpdate, int id, String userinput, String... columnNames) throws SQLException{
+        PreparedStatement statement = conn.prepareStatement(queryUpdate);
+        for (int i = 0; i < columnNames.length; i++) {
+            statement.setString(i + 1, columnNames[i]);
         }
+        statement.setString(1, userinput);
+        statement.setInt(2, id);
+        statement.executeUpdate();
     }
 
     public static void remove(Connection conn, int id, String query) {
@@ -100,13 +99,17 @@ public class DbUtil {
         return count;
     }
 
+    public String hashPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
     public static User create(User user) {
         try (Connection conn = DbUtil.connect()) {
             PreparedStatement statement =
                     conn.prepareStatement(ADD_USER, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, user.getUserName());
             statement.setString(2, user.getEmail());
-//            statement.setString(3, hashPassword(user.getPassword()));
+            statement.setString(3, hashPassword(user.getPassword()));
             statement.executeUpdate();
 
             //Pobieramy wstawiony do bazy identyfikator, a następnie ustawiamy id obiektu user.
@@ -120,6 +123,8 @@ public class DbUtil {
             return null;
         }
     }
+
+
 
 
 
@@ -155,5 +160,10 @@ public class DbUtil {
         for (String option : str) {
             System.out.println(option);
         }
+    }
+
+    public static void password(Connection conn, String tableName, int id) {
+
+
     }
 }
