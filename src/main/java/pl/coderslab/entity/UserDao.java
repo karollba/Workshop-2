@@ -10,6 +10,8 @@ import static java.lang.System.exit;
 import static java.lang.System.setOut;
 import static pl.coderslab.DbUtil.*;
 
+// printuser
+
 // najpiewr  uzytkownik wybiera czyy jest new user czy chce sie zalogowac a potem dopiero te funkcje
 
 public class UserDao {
@@ -48,12 +50,17 @@ public class UserDao {
         PreparedStatement statement = conn.prepareStatement(getGetUserByEmail());
         statement.setString(1, email);
         ResultSet resultSet = statement.executeQuery();
+
         resultSet.next();
 
-        User user = new User(resultSet.getString("username"), resultSet.getString("email"), resultSet.getString("password"));
-        user.setId(resultSet.getInt("id"));
+        if (resultSet.next()) {
 
-        return user;
+            User user = new User(resultSet.getString("username"), resultSet.getString("email"), resultSet.getString("password"));
+            user.setId(resultSet.getInt("id"));
+
+            return user;
+        }
+        return null;
     }
 
 

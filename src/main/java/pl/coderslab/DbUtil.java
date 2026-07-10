@@ -11,7 +11,7 @@ import java.sql.*;
 
 public class DbUtil {
     private static final String ADD_USER = "INSERT INTO users (email, username, password) VALUES (?, ?, ?);";
-    private static final String UPDATE_USER = "UPDATE users SET username = ?, emmail = ?, password = ?, WHERE id = ?";
+    private static final String UPDATE_USER = "UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?";
     private static final String GET_USER_BY_ID = "SELECT * FROM users WHERE id = ?";
     private static final String GET_USER_BY_EMAIL = "SELECT * FROM users WHERE email = ?";
     private static final String REMOVE_USER_BY_ID = "DELETE FROM users WHERE id = ?;";
@@ -121,8 +121,8 @@ public class DbUtil {
         try (Connection conn = DbUtil.connect()) {
             PreparedStatement statement =
                     conn.prepareStatement(ADD_USER, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, user.getUserName());
-            statement.setString(2, user.getEmail());
+            statement.setString(1, user.getEmail());
+            statement.setString(2, user.getUserName());
             statement.setString(3, hashPassword(user.getPassword()));
             statement.executeUpdate();
 
